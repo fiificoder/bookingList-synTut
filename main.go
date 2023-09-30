@@ -34,12 +34,18 @@ func main() {
 		fmt.Println("Enter number of tickets:")
 		fmt.Scan(&userTicket)
 
+		if userTicket > remainingTickets {
+			fmt.Printf("Sorry, Only %v tickets are availabe now, so you can't book %v tickets .!!!!!\n", remainingTickets, userTicket)
+			break
+		}
+
 		remainingTickets = remainingTickets - userTicket
 		bookings = append(bookings, firstName+" "+lastName)
 
-		fmt.Printf("Thank you %s for booking %d tickets for the %s \n", firstName, userTicket, conferenceName)
-		fmt.Printf("You will recieve an email confirmation to %v\n", email)
-		fmt.Printf("%v tickets are now remaining for the conference\n", remainingTickets)
+		fmt.Printf("Thank you %s for booking %d ticket(s) for the %s .\n", firstName, userTicket, conferenceName)
+		fmt.Printf("Hello %s, you will recieve an email confirmation to %v .\n", firstName, email)
+		fmt.Println(" ")
+		fmt.Printf("Tickets remaining for conference: %v\n", remainingTickets)
 
 		var firstNames = []string{}
 		for _, booking := range bookings {
@@ -48,5 +54,13 @@ func main() {
 		}
 
 		fmt.Printf("Successful Bookings: %v \n", firstNames)
+
+		if remainingTickets == 0 {
+			//end program
+			fmt.Println(" ")
+			fmt.Println("----------Sorry, You're late, TICKETS SOLD OUT!!.------------------ ")
+			break
+		}
+
 	}
 }
