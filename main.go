@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
-	"strings"
+	"strconv"
+
+	"github.com/fiificoder/synTut/validate"
 )
 
 var conferenceName = "Go Conference"
@@ -10,16 +12,16 @@ var conferenceName = "Go Conference"
 const conferenceTickets = 70
 
 var remainingTickets uint = 60
-var bookings []string
+var bookings = make([]map[string]string, 0)
 
 func main() {
 
-	greetUsers()
+	validate.GreetUsers(conferenceName, conferenceTickets, remainingTickets)
 
 	for {
 		firstName, lastName, email, userTicket := UserInput()
 
-		isValidName, isValidEmail, isValidTicket := InputValidation(firstName, lastName, email, userTicket)
+		isValidName, isValidEmail, isValidTicket := validate.InputValidation(firstName, lastName, email, userTicket, remainingTickets)
 
 		if isValidName && isValidEmail && isValidTicket {
 			bookTicket(userTicket, firstName, lastName, email)
@@ -48,28 +50,13 @@ func main() {
 	}
 }
 
-func greetUsers() {
-	fmt.Printf("Welcome to %v  booking application\n", conferenceName)
-	fmt.Printf("We have a total of %v tickets and %v tickets are still available.\n", conferenceTickets, remainingTickets)
-	fmt.Println("Get your tickets here to attend")
-
-}
-
 func listFirstNames() []string {
 	var firstNames = []string{}
 	for _, booking := range bookings {
-		var names = strings.Fields(booking)
-		firstNames = append(firstNames, names[0])
+		//var names = strings.Fields(booking)
+		firstNames = append(firstNames, booking["Firstname"])
 	}
 	return firstNames
-}
-
-func InputValidation(firstName string, lastName string, email string, userTicket uint) (bool, bool, bool) {
-	var isValidName bool = len(firstName) >= 2 && len(lastName) >= 2
-	isValidEmail := strings.Contains(email, "@")
-	isValidTicket := userTicket > 0 && userTicket <= remainingTickets
-
-	return isValidName, isValidEmail, isValidTicket
 }
 
 func UserInput() (string, string, string, uint) {
@@ -95,7 +82,16 @@ func UserInput() (string, string, string, uint) {
 
 func bookTicket(userTicket uint, firstName string, lastName string, email string) {
 	remainingTickets = remainingTickets - userTicket
-	bookings = append(bookings, firstName+" "+lastName)
+
+	userData := make(map[string]string)
+	userData["Firstname"] = firstName
+	userData["Lastname"] = lastName
+	userData["Email"] = email
+	userData["NumberOfTickets"] = strconv.FormatUint(uint64(userTicket), 10)
+
+	bookings = append(bookings, userData)
+
+	fmt.Printf("List of bookings is: %v\n", userData)
 
 	fmt.Printf("Thank you %s for booking %d ticket(s) for the %s .\n", firstName, userTicket, conferenceName)
 	fmt.Printf("Hello %s, you will recieve an email confirmation to %v .\n", firstName, email)
