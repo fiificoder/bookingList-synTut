@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/fiificoder/synTut/validate"
 )
@@ -30,11 +31,13 @@ func main() {
 		isValidName, isValidEmail, isValidTicket := validate.InputValidation(firstName, lastName, email, userTicket, remainingTickets)
 
 		if isValidName && isValidEmail && isValidTicket {
+
 			bookTicket(userTicket, firstName, lastName, email)
+			go sendTicket(firstName, lastName, userTicket, email)
 
 			//list of firstNames of Users
 			firstNames := listFirstNames()
-			fmt.Printf("Successful Bookings(First names only): %v \n", firstNames)
+			fmt.Printf("Successful Bookings(First names only): %v\n", firstNames)
 
 			if remainingTickets == 0 {
 				//end program
@@ -105,4 +108,12 @@ func bookTicket(userTicket uint, firstName string, lastName string, email string
 	fmt.Println(" ")
 	fmt.Printf("Tickets remaining for conference: %v\n", remainingTickets)
 
+}
+
+func sendTicket(firstName string, lastName string, userTicket uint, email string) {
+	time.Sleep(40 * time.Second)
+	ticket := fmt.Sprintf("%v tickets for %v %v \n", userTicket, firstName, lastName)
+	fmt.Println("##################################")
+	fmt.Printf("Sending tickets:\n %v\nto email address: %v\n", ticket, email)
+	fmt.Println("##################################")
 }
