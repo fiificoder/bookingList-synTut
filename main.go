@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/fiificoder/synTut/validate"
+	_ "github.com/lib/pq"
 )
 
 var conferenceName = "Go Conference"
@@ -19,20 +20,21 @@ type UserData struct {
 	lastName        string
 	email           string
 	numberOfTickets uint
+	country         string
 }
 
 func main() {
-
+	validate.ConnectDB()
 	validate.GreetUsers(conferenceName, conferenceTickets, remainingTickets)
 
 	for {
-		firstName, lastName, email, userTicket := UserInput()
+		firstName, lastName, email, userTicket, country := UserInput()
 
 		isValidName, isValidEmail, isValidTicket := validate.InputValidation(firstName, lastName, email, userTicket, remainingTickets)
 
 		if isValidName && isValidEmail && isValidTicket {
 
-			bookTicket(userTicket, firstName, lastName, email)
+			bookTicket(userTicket, firstName, lastName, email, country)
 			go sendTicket(firstName, lastName, userTicket, email)
 
 			//list of firstNames of Users
@@ -68,11 +70,12 @@ func listFirstNames() []string {
 	return firstNames
 }
 
-func UserInput() (string, string, string, uint) {
+func UserInput() (string, string, string, uint, string) {
 	var firstName string
 	var lastName string
 	var userTicket uint
 	var email string
+	var country string
 	// ask user for their name
 	fmt.Println("Enter your first name:")
 	fmt.Scan(&firstName)
@@ -83,13 +86,21 @@ func UserInput() (string, string, string, uint) {
 	fmt.Println("Enter your valid email:")
 	fmt.Scan(&email)
 
+	fmt.Println("Enter Country of residence:")
+	fmt.Scanln(&country)
+
 	fmt.Println("Enter number of tickets:")
 	fmt.Scan(&userTicket)
 
-	return firstName, lastName, email, userTicket
+	_, err := validate.Db.Exec("INSERT INTO persons(firtname, lastname, email, country) VALUES($1, $2, $3, $4)", firstName, lastName, email, country)
+	if err != nil {
+		fmt.Println("Error storing user data, Please try again")
+	}
+
+	return firstName, lastName, email, userTicket, country
 }
 
-func bookTicket(userTicket uint, firstName string, lastName string, email string) {
+func bookTicket(userTicket uint, firstName string, lastName string, email string, country string) {
 	remainingTickets = remainingTickets - userTicket
 
 	userData := UserData{
@@ -97,11 +108,17 @@ func bookTicket(userTicket uint, firstName string, lastName string, email string
 		lastName:        lastName,
 		email:           email,
 		numberOfTickets: userTicket,
+		country:         country,
+	}
+
+	_, err := validate.Db.Exec("INSERT INTO persons (firstname, lastname, email, usertickets, country) VALUES($1, $2, $3, $4, $5)", userData.firstName, userData.lastName, userData.email, userData.numberOfTickets, userData.country)
+	if err != nil {
+		fmt.Println("Error storing user data, Please try again")
 	}
 
 	bookings = append(bookings, userData)
 
-	fmt.Printf("List of bookings is: %v\n", userData)
+	//fmt.Printf("List of bookings is: %v\n", userData)
 
 	fmt.Printf("Thank you %s for booking %d ticket(s) for the %s .\n", firstName, userTicket, conferenceName)
 	fmt.Printf("Hello %s, you will recieve an email confirmation to %v .\n", firstName, email)
