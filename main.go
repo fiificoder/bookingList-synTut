@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/fiificoder/synTut/validate"
 )
@@ -12,7 +11,14 @@ var conferenceName = "Go Conference"
 const conferenceTickets = 70
 
 var remainingTickets uint = 60
-var bookings = make([]map[string]string, 0)
+var bookings = make([]UserData, 0)
+
+type UserData struct {
+	firstName       string
+	lastName        string
+	email           string
+	numberOfTickets uint
+}
 
 func main() {
 
@@ -54,7 +60,7 @@ func listFirstNames() []string {
 	var firstNames = []string{}
 	for _, booking := range bookings {
 		//var names = strings.Fields(booking)
-		firstNames = append(firstNames, booking["Firstname"])
+		firstNames = append(firstNames, booking.firstName)
 	}
 	return firstNames
 }
@@ -83,11 +89,12 @@ func UserInput() (string, string, string, uint) {
 func bookTicket(userTicket uint, firstName string, lastName string, email string) {
 	remainingTickets = remainingTickets - userTicket
 
-	userData := make(map[string]string)
-	userData["Firstname"] = firstName
-	userData["Lastname"] = lastName
-	userData["Email"] = email
-	userData["NumberOfTickets"] = strconv.FormatUint(uint64(userTicket), 10)
+	userData := UserData{
+		firstName:       firstName,
+		lastName:        lastName,
+		email:           email,
+		numberOfTickets: userTicket,
+	}
 
 	bookings = append(bookings, userData)
 
