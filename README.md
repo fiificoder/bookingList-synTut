@@ -1,5 +1,7 @@
 # Ticket Booking Application
-A ticket booking application wirtten in Golang.
-There are a fixed ammount of tickets, enter a few details and you book yours.
+This is the CLI version of the ticket booking programme(One of my very first projects). 
 
-This is the CLI version of this programme. There is a web version [web version](www.github.com/fiificoder/goCRUD-API)
+A very simple that makes good use of most of the necesary concepts in golang and also using **postgreSQL** as a means to store user data.
+
+
+**Looking forward to a web advanced version soon**
